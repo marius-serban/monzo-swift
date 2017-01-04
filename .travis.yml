@@ -1,0 +1,12 @@
+os:
+  - linux
+  - osx
+language: generic
+dist: trusty
+osx_image: xcode8
+install:
+  - source ./.travis/install.sh
+script:
+  - swift build
+  - swift build -c release
+  - swift test
