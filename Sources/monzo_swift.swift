@@ -1,4 +1,10 @@
-struct monzo_swift {
+import S4
 
-    var text = "Hello, World!"
+public final class MonzoClient {
+    
+    let httpClient: Responder
+    
+    init(httpClient: Responder) {
+        self.httpClient = httpClient
+    }
 }
