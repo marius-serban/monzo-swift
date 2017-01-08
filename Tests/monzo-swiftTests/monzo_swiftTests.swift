@@ -17,7 +17,7 @@ class monzo_swiftTests : XCTestCase {
         
         XCTAssertEqual(uri.scheme, "https")
         XCTAssertEqual(uri.host, "auth.getmondo.co.uk")
-        XCTAssertEqual(uri.query, "client_id=aClientId&redirect_uri=http://monzo.com/?test=%5B%5D%23frag&state=abc123")
+        XCTAssertEqual(uri.query, "client_id=aClientId&redirect_uri=http://monzo.com/?test=%5B%5D%23fragment&state=abc123")
         XCTAssertNil(uri.userInfo)
         XCTAssertNil(uri.port)
         XCTAssertNil(uri.path)
