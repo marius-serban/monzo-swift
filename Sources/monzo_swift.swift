@@ -13,11 +13,12 @@ public final class MonzoClient {
         self.httpClient = httpClient
     }
     
-    public static func authenticationUri(clientId: String, redirectUri: String, nonce: String) throws -> URI {
+    public static func authorizationUri(clientId: String, redirectUri: String, nonce: String) throws -> URI {
         let query = try "client_id=\(urlQueryPercentEncode(clientId))&redirect_uri=\(urlQueryPercentEncode(redirectUri))&state=\(urlQueryPercentEncode(nonce))"
         
         return URI(scheme: "https", host: "auth.getmondo.co.uk", query: query)
     }
+    
 }
 
 private func urlQueryPercentEncode(_ string: String) throws -> String {

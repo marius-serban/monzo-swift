@@ -12,8 +12,8 @@ class monzo_swiftTests : XCTestCase {
         XCTAssertTrue(sut.httpClient is StubHttpClient)
     }
     
-    func test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthenticationUri_thenAuthenticationUriIsCorrect() {
-        guard let uri = try? MonzoClient.authenticationUri(clientId: "aClientId", redirectUri: "http://monzo.com/?test=[]#fragment", nonce: "abc123") else { XCTFail(#function); return }
+    func test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthorizationUri_thenAuthorizationUriIsCorrect() {
+        guard let uri = try? MonzoClient.authorizationUri(clientId: "aClientId", redirectUri: "http://monzo.com/?test=[]#fragment", nonce: "abc123") else { XCTFail(#function); return }
         
         XCTAssertEqual(uri.scheme, "https")
         XCTAssertEqual(uri.host, "auth.getmondo.co.uk")
@@ -27,7 +27,7 @@ class monzo_swiftTests : XCTestCase {
     static var allTests : [(String, (monzo_swiftTests) -> () throws -> Void)] {
         return [
             ("test_givenAHttpCleint_whenInitialised_thenHttpClientIsSet", test_givenAHttpClient_whenInitialialised_thenHttpClientIsSet),
-            ("test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthenticationUri_thenAuthenticationUriIsCorrect", test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthenticationUri_thenAuthenticationUriIsCorrect),
+            ("test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthorizationUri_thenAuthorizationUriIsCorrect", test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthorizationUri_thenAuthorizationUriIsCorrect),
         ]
     }
 }
