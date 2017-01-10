@@ -1,6 +1,7 @@
 import XCTest
-@testable import monzo_swiftTests
+@testable import MonzoTests
 
 XCTMain([
-     testCase(monzo_swiftTests.allTests),
+     testCase(ClientGlobalTests.allTests),
+     testCase(ClientAuthenticationTests.allTests),
 ])
