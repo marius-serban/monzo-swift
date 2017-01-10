@@ -24,7 +24,7 @@ let package = Package(
 
 ## Support
 
-You can create a Github [issue](https://github.com/marius-serban/monzo-swift/issues/new) in this repository. When stating your issue be sure to add enough details, specify what module is causing the problem and reproduction steps.
+You can create a Github [issue](https://github.com/marius-serban/monzo-swift/issues/new) in this repository. When stating your issue be sure to add enough details about what's causing the problem and reproduction steps.
 
 ## License
 
