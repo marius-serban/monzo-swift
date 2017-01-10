@@ -13,8 +13,3 @@ if [ -f ".swift-version" ] || [ -n "$SWIFT_VERSION" ]; then
 else
   swiftenv rehash
 fi
-
-# workaround travis bug https://github.com/travis-ci/travis-ci/issues/6307
-if [[ $(uname) == "Darwin" ]]; then
-    rvm get stable
-fi
