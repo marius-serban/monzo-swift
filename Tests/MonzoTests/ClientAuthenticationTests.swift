@@ -94,8 +94,10 @@ class ClientAuthenticationTests : XCTestCase {
         return [
             ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri),
             ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders),
+            ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectBody", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectBody),
             ("test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned", test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned),
             ("test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown),
+            ("test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown),
         ]
     }
     
