@@ -47,14 +47,20 @@ class ClientAuthenticationTests : XCTestCase {
         let stubHttpClient = StubHttpClient(response: mockSuccessfulAuthenticationResponse)
         let sut = Monzo.Client(httpClient: stubHttpClient)
         
-        guard let userCredentials = try? sut.authenticate(withCode: "", clientId: "", clientSecret: "") else { XCTFail(#function); return }
         
-        XCTAssertEqual(userCredentials.accessToken, "a token")
-        XCTAssertEqual(userCredentials.clientId, "a client id")
-        XCTAssertEqual(userCredentials.expiresIn, 21599)
-        XCTAssertEqual(userCredentials.refreshToken, "a refresh token")
-        XCTAssertEqual(userCredentials.tokenType, "Bearer")
-        XCTAssertEqual(userCredentials.userId, "a user id")
+        do {
+            let userCredentials = try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+            XCTAssertEqual(userCredentials.accessToken, "a token")
+            XCTAssertEqual(userCredentials.clientId, "a client id")
+            XCTAssertEqual(userCredentials.expiresIn, 21599)
+            XCTAssertEqual(userCredentials.refreshToken, "a refresh token")
+            XCTAssertEqual(userCredentials.tokenType, "Bearer")
+            XCTAssertEqual(userCredentials.userId, "a user id")
+        } catch let error as CustomStringConvertible {
+            XCTFail(error.description)
+        } catch {
+            XCTFail("Unknown error while authenticating")
+        }
     }
     
     func test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown() {

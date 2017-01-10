@@ -1,13 +1,6 @@
 import S4
 import Foundation
 
-public enum ClientError : Error {
-    case parameterEncodingError
-    case accessTokenExpired
-    case responseError(Status)
-    case parsingError
-}
-
 public final class Client {
     
     public let httpClient: Responder
