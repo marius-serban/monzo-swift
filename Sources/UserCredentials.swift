@@ -14,7 +14,7 @@ extension UserCredentials {
         
         accessToken = try dictionary.value(forKey: "access_token")
         clientId = try dictionary.value(forKey: "client_id")
-        expiresIn = try dictionary.value(forKey: "expires_in")
+        expiresIn = UInt(try dictionary.value(forKey: "expires_in") as Int)
         refreshToken = try dictionary.value(forKey: "refresh_token")
         tokenType = try dictionary.value(forKey: "token_type")
         userId = try dictionary.value(forKey: "user_id")
