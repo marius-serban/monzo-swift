@@ -12,7 +12,7 @@ public final class Client {
     }
     
     public static func authorizationUri(clientId: String, redirectUri: String, nonce: String) throws -> URI {
-        let query = try "client_id=\(urlQueryPercentEncode(clientId))&redirect_uri=\(urlQueryPercentEncode(redirectUri))&state=\(urlQueryPercentEncode(nonce))"
+        let query = try "client_id=\(clientId.urlQueryPercentEncoded())&redirect_uri=\(redirectUri.urlQueryPercentEncoded())&state=\(nonce.urlQueryPercentEncoded())"
         
         return URI(scheme: "https", host: "auth.getmondo.co.uk", query: query)
     }
@@ -34,7 +34,7 @@ public final class Client {
     private static func authenticationRequest(authorizationCode: String, clientId: String, clientSecret: String) throws -> Request {
         let tokenUri = uri(withPath: "oauth2/token")
         let authHeaders = headers(contentType: "application/x-www-form-urlencoded; charset=utf-8")
-        let stringBody = try "grant_type=authorization_code&client_id=\(urlFormPercentEncode(clientId))&client_secret=\(urlFormPercentEncode(clientSecret))&redirect_uri=&code=\(urlFormPercentEncode(authorizationCode))"
+        let stringBody = try "grant_type=authorization_code&client_id=\(clientId.urlFormPercentEncoded())&client_secret=\(clientSecret.urlFormPercentEncoded())&redirect_uri=&code=\(authorizationCode.urlFormPercentEncoded())"
         guard let bodyData = stringBody.data(using: .utf8) else { throw ClientError.parameterEncodingError }
         let body = Body.buffer(Data([Byte](bodyData)))
         
@@ -57,17 +57,4 @@ public final class Client {
         return headers
     }
     
-}
-
-fileprivate func urlQueryPercentEncode(_ string: String) throws -> String {
-    guard let escaped = string.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { throw ClientError.parameterEncodingError }
-    return escaped
-}
-
-fileprivate func urlFormPercentEncode(_ string: String) throws -> String {
-    // RFC 3986 allowed characters
-    var allowed = CharacterSet.alphanumerics
-    allowed.insert(charactersIn: "-._~ ") // workaround for SR-2509
-    guard let encoded = string.addingPercentEncoding(withAllowedCharacters: allowed) else { throw ClientError.parameterEncodingError }
-    return encoded.replacingOccurrences(of: " ", with: "+")
 }
