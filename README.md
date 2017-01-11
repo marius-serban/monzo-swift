@@ -22,6 +22,14 @@ let package = Package(
 )
 ```
 
+### Ubuntu
+
+Install the development headers for cURL
+
+```shell
+sudo apt-get install libcurl4-openssl-dev
+```
+
 ## Support
 
 You can create a Github [issue](https://github.com/marius-serban/monzo-swift/issues/new) in this repository. When stating your issue be sure to add enough details about what's causing the problem and reproduction steps.
