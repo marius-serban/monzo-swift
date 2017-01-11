@@ -6,7 +6,7 @@
 [![Travis][travis-badge]][travis-url]
 [![Codebeat][codebeat-badge]][codebeat-url]
 
-A Monzo client written in Swift that provides a simple interface to the Monzo API. This package is targeted towards server side use on Linux; if you're looking for Monzo client for iOS then have a look at [MondoKit](https://github.com/pollarm/MondoKit).
+A Monzo client written in Swift that provides a simple interface to the Monzo API. This package is targeted towards server side use on Linux; if you're looking for a Monzo client for iOS then have a look at [MondoKit](https://github.com/pollarm/MondoKit).
 
 API documentation, user guides and setup information can be found at [monzo.com/docs](https://monzo.com/docs/).
 
