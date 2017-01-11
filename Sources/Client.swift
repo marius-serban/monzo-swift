@@ -66,7 +66,8 @@ fileprivate func urlQueryPercentEncode(_ string: String) throws -> String {
 
 fileprivate func urlFormPercentEncode(_ string: String) throws -> String {
     // RFC 3986 allowed characters
-    let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~ "))
+    var allowed = CharacterSet.alphanumerics
+    allowed.insert(charactersIn: "-._~ ") // workaround for SR-2509
     guard let encoded = string.addingPercentEncoding(withAllowedCharacters: allowed) else { throw ClientError.parameterEncodingError }
     return encoded.replacingOccurrences(of: " ", with: "+")
 }
