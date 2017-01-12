@@ -11,7 +11,7 @@ class ClientAuthenticationTests : XCTestCase {
         _ = try? sut.authenticate(withCode: "", clientId: "", clientSecret: "")
         
         let uri = spyHttpClient.lastCapturedRequest.uri
-        XCTAssertEqual(uri.description, "https://api.getmondo.co.uk/oauth2/token")
+        XCTAssertEqual(uri.description, "https://api.monzo.com/oauth2/token")
     }
     
     func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders() {
@@ -22,7 +22,7 @@ class ClientAuthenticationTests : XCTestCase {
         
         let headers = spyHttpClient.lastCapturedRequest.headers.headers
         let expectedHeaders: [CaseInsensitiveString: String] = [
-            "host": "api.getmondo.co.uk",
+            "host": "api.monzo.com",
             "connection": "close",
             "content-type": "application/x-www-form-urlencoded; charset=utf-8"
         ]
@@ -46,7 +46,6 @@ class ClientAuthenticationTests : XCTestCase {
         let mockSuccessfulAuthenticationResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
         let stubHttpClient = StubHttpClient(response: mockSuccessfulAuthenticationResponse)
         let sut = Monzo.Client(httpClient: stubHttpClient)
-        
         
         do {
             let userCredentials = try sut.authenticate(withCode: "", clientId: "", clientSecret: "")

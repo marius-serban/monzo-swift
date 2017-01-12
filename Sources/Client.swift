@@ -42,12 +42,12 @@ public final class Client {
     }
     
     private static func uri(withPath path: String, query: String? = nil) -> URI {
-        return URI(scheme: "https", host: "api.getmondo.co.uk", path: path, query: query)
+        return URI(scheme: "https", host: "api.monzo.com", path: path, query: query)
     }
     
     private static func headers(contentType: String? = nil) -> Headers {
         var headers = Headers([
-            "host": "api.getmondo.co.uk",
+            "host": "api.monzo.com",
             "connection": "close",
             ])
         if let contentType = contentType {
