@@ -1,13 +1,19 @@
-os:
-  - linux
+sudo: required
+
 language: generic
-dist: trusty
+
+services:
+  - docker
+
 notifications:
   email:
     on_success: never
     on_failure: change
-install:
-  - source ./.travis/install.sh
+
+before_install:
+  - docker run kylef/swiftenv:1
+  - docker ps -a
+
 script:
   - swift build
   - swift build -c release
