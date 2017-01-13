@@ -1,14 +1,22 @@
-os:
-  - linux
+sudo: required
+
 language: generic
-dist: trusty
+
+services:
+  - docker
+
 notifications:
   email:
     on_success: never
     on_failure: change
+
+before_install:
+  - docker run -dt --name ubuntu16 -v $(pwd):/source kylef/swiftenv:1
+
 install:
-  - source ./.travis/install.sh
+  - docker exec ubuntu16 /bin/bash -c "swiftenv rehash && cd source && swiftenv install"
+
 script:
-  - swift build
-  - swift build -c release
-  - swift test
+  - docker exec ubuntu16 /bin/bash -c "cd source && swift build"
+  - docker exec ubuntu16 /bin/bash -c "cd source && swift build -c release"
+  - docker exec ubuntu16 /bin/bash -c "cd source && swift test"
