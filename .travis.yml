@@ -11,10 +11,12 @@ notifications:
     on_failure: change
 
 before_install:
-  - docker run kylef/swiftenv:1
-  - docker ps -a
+  - docker run -dt --name ubuntu16 -v $(pwd):/source kylef/swiftenv:1
+
+install:
+  - docker exec ubuntu16 /bin/bash -c "swiftenv rehash && cd source && swiftenv install"
 
 script:
-  - swift build
-  - swift build -c release
-  - swift test
+  - docker exec ubuntu16 /bin/bash -c "cd source && swift build"
+  - docker exec ubuntu16 /bin/bash -c "cd source && swift build -c release"
+  - docker exec ubuntu16 /bin/bash -c "cd source && swift test"
