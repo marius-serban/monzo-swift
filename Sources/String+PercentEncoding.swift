@@ -1,5 +1,4 @@
 import Foundation
-import CcURL
 
 extension String {
     
@@ -9,21 +8,12 @@ extension String {
     }
     
     func urlFormPercentEncoded() throws -> String {
-        let encodedComponents = components(separatedBy: " ").flatMap(cURLEncode)
+        // according to RFC 3986
+        var allowed = CharacterSet.alphanumerics
+        allowed.insert(charactersIn: "-._~")
+        let encodedComponents = components(separatedBy: " ").flatMap { component in
+            return component.addingPercentEncoding(withAllowedCharacters: allowed)
+        }
         return encodedComponents.joined(separator: "+")
     }
-}
-
-//FIXME: remove cURL dependency once SR-3216 is fixed
-fileprivate func cURLEncode(string: String) -> String? {
-    guard !string.isEmpty else { return "" }
-    guard let handle = curl_easy_init() else { return nil }
-    guard let output = curl_easy_escape(handle, string, Int32(string.utf8.count)) else { return nil }
-    
-    let result = String(cString: output)
-    
-    curl_free(output)
-    curl_easy_cleanup(handle)
-    
-    return result
 }

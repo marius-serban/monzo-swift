@@ -12,6 +12,8 @@ API documentation, user guides and setup information can be found at [monzo.com/
 
 ## Installation
 
+**Note:** the minimum required swift version is `DEVELOPMENT-SNAPSHOT-2016-11-08-a`
+
 ```swift
 import PackageDescription
 
@@ -20,14 +22,6 @@ let package = Package(
         .Package(url: "https://github.com/marius-serban/monzo-swift.git"),
     ]
 )
-```
-
-### Ubuntu
-
-Install the development headers for cURL
-
-```shell
-sudo apt-get install libcurl4-openssl-dev
 ```
 
 ## Support
