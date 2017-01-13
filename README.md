@@ -12,6 +12,8 @@ API documentation, user guides and setup information can be found at [monzo.com/
 
 ## Installation
 
+**Note:** the minimum required swift version is `DEVELOPMENT-SNAPSHOT-2016-11-08-a`
+
 ```swift
 import PackageDescription
 
