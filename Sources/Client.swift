@@ -31,7 +31,7 @@ public final class Client {
         return try retrieve(authenticationRequest)
     }
     
-    public func ping(accessToken: String) throws {
+    public func ping(accessToken: String? = nil) throws {
         let pingRequest = ApiRequest(path: "ping", accessToken: accessToken)
         
         let json = try retrieve(pingRequest) as JsonObject

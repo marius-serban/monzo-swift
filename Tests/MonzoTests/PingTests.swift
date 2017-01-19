@@ -4,7 +4,7 @@ import Monzo
 
 class PingTests : XCTestCase {
     
-    func test_givenPingParameters_whenPinging_thenTheRequestHasCorrectUri() {
+    func test_pingRequestHasCorrectUri() {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
@@ -29,7 +29,22 @@ class PingTests : XCTestCase {
         XCTAssertEqual(headers, expectedHeaders)
     }
     
-    func test_givenAccessToken_whenPinging_thenTheRequestHasEmptyBody() {
+    func test_givenNoAccessToken_whenPinging_thenTheRequestHasCorrectHeaders() {
+        let spyHttpClient = SpyHttpClient()
+        let sut = Monzo.Client(httpClient: spyHttpClient)
+        
+        try? sut.ping()
+        
+        let headers = spyHttpClient.lastCapturedRequest.headers.headers
+        let expectedHeaders: [CaseInsensitiveString: String] = [
+            "host": "api.monzo.com",
+            "connection": "close"
+        ]
+        XCTAssertEqual(headers, expectedHeaders)
+    }
+
+    
+    func test_pingingRequestHasEmptyBody() {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
@@ -84,9 +99,9 @@ class PingTests : XCTestCase {
     
     static var allTests : [(String, (PingTests) -> () throws -> Void)] {
         return [
-            ("test_givenPingParameters_whenPinging_thenTheRequestHasCorrectUri", test_givenPingParameters_whenPinging_thenTheRequestHasCorrectUri),
+            ("test_pingRequestHasCorrectUri", test_pingRequestHasCorrectUri),
             ("test_givenAccessToken_whenPinging_thenTheRequestHasCorrectHeaders", test_givenAccessToken_whenPinging_thenTheRequestHasCorrectHeaders),
-            ("test_givenAccessToken_whenPinging_thenTheRequestHasEmptyBody", test_givenAccessToken_whenPinging_thenTheRequestHasEmptyBody),
+            ("test_pingingRequestHasEmptyBody", test_pingingRequestHasEmptyBody),
             ("test_givenASuccessfulResponse_whenPinging_thenNoExceptionIsThrown", test_givenASuccessfulResponse_whenPinging_thenNoExceptionIsThrown),
             ("test_givenAnInvalidResponseStatus_whenPinging_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_whenPinging_thenResponseErrorIsThrown),
             ("test_givenAnInvalidResponseBody_whenPinging_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_whenPinging_thenParsingErrorIsThrown),

@@ -4,7 +4,7 @@ import Monzo
 
 class AuthenticationTests : XCTestCase {
     
-    func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri() {
+    func test_authenticationRequestHasCorrectUri() {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
@@ -14,7 +14,7 @@ class AuthenticationTests : XCTestCase {
         XCTAssertEqual(uri.description, "https://api.monzo.com/oauth2/token")
     }
     
-    func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders() {
+    func test_authenticationRequestHasCorrectHeaders() {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
@@ -94,8 +94,8 @@ class AuthenticationTests : XCTestCase {
     
     static var allTests : [(String, (AuthenticationTests) -> () throws -> Void)] {
         return [
-            ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri),
-            ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders),
+            ("test_authenticationRequestHasCorrectUri", test_authenticationRequestHasCorrectUri),
+            ("test_authenticationRequestHasCorrectHeaders", test_authenticationRequestHasCorrectHeaders),
             ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody),
             ("test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned", test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned),
             ("test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown),
