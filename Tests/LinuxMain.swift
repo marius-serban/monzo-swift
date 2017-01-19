@@ -2,6 +2,7 @@ import XCTest
 @testable import MonzoTests
 
 XCTMain([
-     testCase(ClientGlobalTests.allTests),
-     testCase(ClientAuthenticationTests.allTests),
+     testCase(AuthorizationTests.allTests),
+     testCase(AuthenticationTests.allTests),
+     testCase(PingTests.allTests),
 ])
