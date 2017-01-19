@@ -1,8 +1,8 @@
 import XCTest
 import S4
-@testable import Monzo
+import Monzo
 
-class ClientAuthenticationTests : XCTestCase {
+class AuthenticationTests : XCTestCase {
     
     func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri() {
         let spyHttpClient = SpyHttpClient()
@@ -29,7 +29,7 @@ class ClientAuthenticationTests : XCTestCase {
         XCTAssertEqual(headers, expectedHeaders)
     }
     
-    func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectBody() {
+    func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody() {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
@@ -37,8 +37,11 @@ class ClientAuthenticationTests : XCTestCase {
         
         guard case .buffer(let bodyData) = spyHttpClient.lastCapturedRequest.body else { XCTFail(#function); return }
         let bodyString = String(bytes: bodyData.bytes, encoding: .utf8)
-        let expectedString = "grant_type=authorization_code&client_id=a+string+with+spaces&client_secret=&redirect_uri=&code=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%F0%9F%8C%8E-._~+"
-        XCTAssertEqual(bodyString, expectedString)
+        XCTAssertNotNil(bodyString?.range(of: "grant_type=authorization_code"))
+        XCTAssertNotNil(bodyString?.range(of: "client_id=a+string+with+spaces"))
+        XCTAssertNotNil(bodyString?.range(of: "client_secret="))
+        XCTAssertNotNil(bodyString?.range(of: "redirect_uri="))
+        XCTAssertNotNil(bodyString?.range(of: "code=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%F0%9F%8C%8E-._~+"))
     }
     
     func test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned() {
@@ -89,11 +92,11 @@ class ClientAuthenticationTests : XCTestCase {
         XCTFail(#function)
     }
     
-    static var allTests : [(String, (ClientAuthenticationTests) -> () throws -> Void)] {
+    static var allTests : [(String, (AuthenticationTests) -> () throws -> Void)] {
         return [
             ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectUri),
             ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectHeaders),
-            ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectBody", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectBody),
+            ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody),
             ("test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned", test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned),
             ("test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown),
             ("test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown),
