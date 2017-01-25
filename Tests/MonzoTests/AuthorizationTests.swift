@@ -4,7 +4,7 @@ import Monzo
 
 class AuthorizationTests : XCTestCase {
     
-    func test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthorizationUri_thenAuthorizationUriIsCorrect() {
+    func test_givenClientIdAndRedirectUriAndNonce_thenAuthorizationUriIsCorrect() {
         let uri = Client.authorizationUri(clientId: "aClientId", redirectUri: "http://host.com/?test=[]#fragment", nonce: "abc123")
         
         let uriString = uri.description
@@ -16,7 +16,7 @@ class AuthorizationTests : XCTestCase {
     
     static var allTests : [(String, (AuthorizationTests) -> () throws -> Void)] {
         return [
-            ("test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthorizationUri_thenAuthorizationUriIsCorrect", test_givenClientIdAndRedirectUriAndNonce_whenGeneratingAuthorizationUri_thenAuthorizationUriIsCorrect),
+            ("test_givenClientIdAndRedirectUriAndNonce_thenAuthorizationUriIsCorrect", test_givenClientIdAndRedirectUriAndNonce_thenAuthorizationUriIsCorrect),
         ]
     }
 }

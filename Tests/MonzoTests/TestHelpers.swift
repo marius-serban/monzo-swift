@@ -1,3 +1,5 @@
+import XCTest
+import Monzo
 import S4
 
 struct StubHttpClient : Responder {
@@ -35,4 +37,70 @@ extension URI: CustomStringConvertible {
         
         return [schemeString, userString, hostString, portString, pathString, queryString, fragmentString].joined()
     }
+}
+
+extension XCTestCase {
+    
+    func assertRequestUriEquals<T>(_ expectedUri: String, forClientAction action: (Monzo.Client) throws -> T) {
+        let spyHttpClient = SpyHttpClient()
+        let sut = Monzo.Client(httpClient: spyHttpClient)
+        
+        _ = try? action(sut)
+        
+        let uri = spyHttpClient.lastCapturedRequest.uri
+        XCTAssertEqual(uri.description, expectedUri)
+    }
+    
+    func assertRequestHeadersEqual<T>(_ expectedHeaders: [CaseInsensitiveString: String], forClientAction action: (Monzo.Client) throws -> T) {
+        let spyHttpClient = SpyHttpClient()
+        let sut = Monzo.Client(httpClient: spyHttpClient)
+        
+        _ = try? action(sut)
+        
+        let headers = spyHttpClient.lastCapturedRequest.headers.headers
+        XCTAssertEqual(headers, expectedHeaders)
+    }
+    
+    func assertRequestBodyIsEmpty<T>(_ testName: String = String(describing: #function), forClientAction action: (Monzo.Client) throws -> T) {
+        let spyHttpClient = SpyHttpClient()
+        let sut = Monzo.Client(httpClient: spyHttpClient)
+        
+        _ = try? action(sut)
+        
+        guard case .buffer(let bodyData) = spyHttpClient.lastCapturedRequest.body else { XCTFail(testName); return }
+        let bodyString = String(bytes: bodyData.bytes, encoding: .utf8)
+        XCTAssertEqual(bodyString, "")
+    }
+    
+    func assertParsing<T>(forResponseBody body: String, action: (Monzo.Client) throws -> T, assertions assertBlock: ((T) -> Void)?) {
+        let responseBodyData = S4.Data([Byte](body.data(using: .utf8)!))
+        let mockSuccessfulResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
+        let stubHttpClient = StubHttpClient(response: mockSuccessfulResponse)
+        let sut = Monzo.Client(httpClient: stubHttpClient)
+        
+        do {
+            let parseResult = try action(sut)
+            assertBlock?(parseResult)
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func assertThrows<T>(_ testName: String = String(describing: #function), forResponseStatus status: Status, action: (Monzo.Client) throws -> T, errorHandler: (Error) -> Void) {
+        let mockBadRequestStatusResponse = Response(version: Version(major: 0, minor: 0), status: status, headers: Headers(), cookieHeaders: [], body: .buffer([]))
+        let stubHttpClient = StubHttpClient(response: mockBadRequestStatusResponse)
+        let sut = Monzo.Client(httpClient: stubHttpClient)
+        
+        XCTAssertThrowsError(try action(sut), testName, errorHandler)
+    }
+    
+    func assertThrows<T>(_ testName: String = String(describing: #function), forResponseBody body: String, action: (Monzo.Client) throws -> T, errorHandler: (Error) -> Void) {
+        let responseBodyData = S4.Data([Byte](body.data(using: .utf8)!))
+        let mockSuccessfulResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
+        let stubHttpClient = StubHttpClient(response: mockSuccessfulResponse)
+        let sut = Monzo.Client(httpClient: stubHttpClient)
+        
+        XCTAssertThrowsError(try action(sut), testName, errorHandler)
+    }
+    
 }

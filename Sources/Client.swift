@@ -18,7 +18,7 @@ public final class Client {
         return URI(scheme: "https", host: "auth.getmondo.co.uk", query: parameters.urlQueryEncoded)
     }
     
-    public func authenticate(withCode authorizationCode: String, clientId: String, clientSecret: String) throws -> UserCredentials {
+    public func authenticate(withCode authorizationCode: String, clientId: String, clientSecret: String) throws -> Credentials {
         let authenticationRequest = ApiRequest(method: .post, path: "oauth2/token", parameters: [
             ("grant_type", "authorization_code"),
             ("client_id", clientId),
@@ -37,5 +37,11 @@ public final class Client {
         let json = try retrieve(pingRequest) as JsonObject
 
         guard try json.value(forKey: "ping") == "pong" else { throw ClientError.parsingError }
+    }
+    
+    public func whoami(accessToken: String? = nil) throws -> AccessTokenInfo {
+        let whoamiRequest = ApiRequest(path: "ping/whoami", accessToken: accessToken)
+        
+        return try retrieve(whoamiRequest)
     }
 }

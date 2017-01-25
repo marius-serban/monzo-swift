@@ -4,107 +4,68 @@ import Monzo
 
 class PingTests : XCTestCase {
     
-    func test_pingRequestHasCorrectUri() {
-        let spyHttpClient = SpyHttpClient()
-        let sut = Monzo.Client(httpClient: spyHttpClient)
-        
-        try? sut.ping(accessToken: "")
-        
-        let uri = spyHttpClient.lastCapturedRequest.uri
-        XCTAssertEqual(uri.description, "https://api.monzo.com/ping")
+    func test_requestHasCorrectUri() {
+        assertRequestUriEquals("https://api.monzo.com/ping", forClientAction: { sut in
+            try sut.ping()
+        })
     }
     
-    func test_givenAccessToken_whenPinging_thenTheRequestHasCorrectHeaders() {
-        let spyHttpClient = SpyHttpClient()
-        let sut = Monzo.Client(httpClient: spyHttpClient)
-
-        try? sut.ping(accessToken: "a_token")
-
-        let headers = spyHttpClient.lastCapturedRequest.headers.headers
-        let expectedHeaders: [CaseInsensitiveString: String] = [
+    func test_givenAccessToken_thenTheRequestHasCorrectHeaders() {
+        assertRequestHeadersEqual([
             "host": "api.monzo.com",
             "connection": "close",
             "authorization": "Bearer a_token"
-        ]
-        XCTAssertEqual(headers, expectedHeaders)
+            ], forClientAction: { sut in
+                try sut.ping(accessToken: "a_token")
+        })
     }
     
-    func test_givenNoAccessToken_whenPinging_thenTheRequestHasCorrectHeaders() {
-        let spyHttpClient = SpyHttpClient()
-        let sut = Monzo.Client(httpClient: spyHttpClient)
-        
-        try? sut.ping()
-        
-        let headers = spyHttpClient.lastCapturedRequest.headers.headers
-        let expectedHeaders: [CaseInsensitiveString: String] = [
+    func test_givenNoAccessToken_thenTheRequestHasCorrectHeaders() {
+        assertRequestHeadersEqual([
             "host": "api.monzo.com",
             "connection": "close"
-        ]
-        XCTAssertEqual(headers, expectedHeaders)
-    }
-
-    
-    func test_pingingRequestHasEmptyBody() {
-        let spyHttpClient = SpyHttpClient()
-        let sut = Monzo.Client(httpClient: spyHttpClient)
-        
-        try? sut.ping(accessToken: "a_token")
-        
-        guard case .buffer(let bodyData) = spyHttpClient.lastCapturedRequest.body else { XCTFail(#function); return }
-        let bodyString = String(bytes: bodyData.bytes, encoding: .utf8)
-        XCTAssertEqual(bodyString, "")
+            ], forClientAction: { sut in
+                try sut.ping()
+        })
     }
     
-    func test_givenASuccessfulResponse_whenPinging_thenNoExceptionIsThrown() {
-        let responseBodyData = S4.Data([Byte]("{\"ping\":\"pong\"}".data(using: .utf8)!))
-        let mockSuccessfulPingnResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
-        let stubHttpClient = StubHttpClient(response: mockSuccessfulPingnResponse)
-        let sut = Monzo.Client(httpClient: stubHttpClient)
-        
-        do {
+    func test_requestHasEmptyBody() {
+        assertRequestBodyIsEmpty(forClientAction: { sut in
+            try sut.ping()
+        })
+    }
+    
+    func test_givenASuccessfulResponse_thenNoExceptionIsThrown() {
+        assertParsing(forResponseBody: "{\"ping\":\"pong\"}", action: { sut in
             try sut.ping(accessToken: "")
-        } catch let error as CustomStringConvertible {
-            XCTFail(error.description)
-        } catch {
-            XCTFail("Unknown error while authenticating")
-        }
+        }, assertions: nil)
     }
     
-    func test_givenAnInvalidResponseStatus_whenPinging_thenResponseErrorIsThrown() {
-        let mockBadRequestStatusResponse = Response(version: Version(major: 0, minor: 0), status: .badRequest, headers: Headers(), cookieHeaders: [], body: .buffer([]))
-        let stubHttpClient = StubHttpClient(response: mockBadRequestStatusResponse)
-        let sut = Monzo.Client(httpClient: stubHttpClient)
-        
-        do {
+    func test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown() {
+        assertThrows(forResponseStatus: .badRequest, action: { sut in
             try sut.ping(accessToken: "")
-        } catch Monzo.ClientError.responseError(.badRequest) {
-            return
-        } catch { }
-        XCTFail(#function)
+        }, errorHandler: { error in
+            guard case Monzo.ClientError.responseError(.badRequest) = error else { XCTFail(#function); return }
+        })
     }
     
-    func test_givenAnInvalidResponseBody_whenPinging_thenParsingErrorIsThrown() {
-        let responseBodyData = S4.Data([Byte]("{}".data(using: .utf8)!))
-        let mockInvalidBodyResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
-        let stubHttpClient = StubHttpClient(response: mockInvalidBodyResponse)
-        let sut = Monzo.Client(httpClient: stubHttpClient)
-        
-        do {
+    func test_givenAnInvalidResponseBody_thenParsingErrorIsThrown() {
+        assertThrows(forResponseBody: "{}", action: { sut in
             try sut.ping(accessToken: "")
-        } catch Monzo.ClientError.parsingError {
-            return
-        } catch { }
-        XCTFail(#function)
+        }, errorHandler: { error in
+            guard case Monzo.ClientError.parsingError = error else { XCTFail(#function); return }
+        })
     }
     
     static var allTests : [(String, (PingTests) -> () throws -> Void)] {
         return [
-            ("test_pingRequestHasCorrectUri", test_pingRequestHasCorrectUri),
-            ("test_givenAccessToken_whenPinging_thenTheRequestHasCorrectHeaders", test_givenAccessToken_whenPinging_thenTheRequestHasCorrectHeaders),
-            ("test_pingingRequestHasEmptyBody", test_pingingRequestHasEmptyBody),
-            ("test_givenASuccessfulResponse_whenPinging_thenNoExceptionIsThrown", test_givenASuccessfulResponse_whenPinging_thenNoExceptionIsThrown),
-            ("test_givenAnInvalidResponseStatus_whenPinging_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_whenPinging_thenResponseErrorIsThrown),
-            ("test_givenAnInvalidResponseBody_whenPinging_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_whenPinging_thenParsingErrorIsThrown),
+            ("test_requestHasCorrectUri", test_requestHasCorrectUri),
+            ("test_givenAccessToken_thenTheRequestHasCorrectHeaders", test_givenAccessToken_thenTheRequestHasCorrectHeaders),
+            ("test_givenNoAccessToken_thenTheRequestHasCorrectHeaders", test_givenNoAccessToken_thenTheRequestHasCorrectHeaders),
+            ("test_requestHasEmptyBody", test_requestHasEmptyBody),
+            ("test_givenASuccessfulResponse_thenNoExceptionIsThrown", test_givenASuccessfulResponse_thenNoExceptionIsThrown),
+            ("test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown),
+            ("test_givenAnInvalidResponseBody_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_thenParsingErrorIsThrown),
         ]
     }
     
