@@ -4,32 +4,23 @@ import Monzo
 
 class AuthenticationTests : XCTestCase {
     
-    func test_authenticationRequestHasCorrectUri() {
-        let spyHttpClient = SpyHttpClient()
-        let sut = Monzo.Client(httpClient: spyHttpClient)
-        
-        _ = try? sut.authenticate(withCode: "", clientId: "", clientSecret: "")
-        
-        let uri = spyHttpClient.lastCapturedRequest.uri
-        XCTAssertEqual(uri.description, "https://api.monzo.com/oauth2/token")
+    func test_requestHasCorrectUri() {
+        assertRequestUriEquals("https://api.monzo.com/oauth2/token", forClientAction: { sut in
+            try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+        })
     }
     
-    func test_authenticationRequestHasCorrectHeaders() {
-        let spyHttpClient = SpyHttpClient()
-        let sut = Monzo.Client(httpClient: spyHttpClient)
-        
-        _ = try? sut.authenticate(withCode: "", clientId: "", clientSecret: "")
-        
-        let headers = spyHttpClient.lastCapturedRequest.headers.headers
-        let expectedHeaders: [CaseInsensitiveString: String] = [
+    func test_requestHasCorrectHeaders() {
+        assertRequestHeadersEqual([
             "host": "api.monzo.com",
             "connection": "close",
             "content-type": "application/x-www-form-urlencoded; charset=utf-8"
-        ]
-        XCTAssertEqual(headers, expectedHeaders)
+            ], forClientAction: { sut in
+                try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+        })
     }
     
-    func test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody() {
+    func test_givenAuthenticationParameters_thenTheRequestHasCorrectParametersInBody() {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
@@ -44,28 +35,20 @@ class AuthenticationTests : XCTestCase {
         XCTAssertNotNil(bodyString?.range(of: "code=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%F0%9F%8C%8E-._~+"))
     }
     
-    func test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned() {
-        let responseBodyData = S4.Data([Byte]("{\"access_token\":\"a token\",\"client_id\":\"a client id\",\"expires_in\":21599,\"refresh_token\":\"a refresh token\",\"token_type\":\"Bearer\",\"user_id\":\"a user id\"}".data(using: .utf8)!))
-        let mockSuccessfulAuthenticationResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
-        let stubHttpClient = StubHttpClient(response: mockSuccessfulAuthenticationResponse)
-        let sut = Monzo.Client(httpClient: stubHttpClient)
-        
-        do {
-            let userCredentials = try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
-            XCTAssertEqual(userCredentials.accessToken, "a token")
-            XCTAssertEqual(userCredentials.clientId, "a client id")
-            XCTAssertEqual(userCredentials.expiresIn, 21599)
-            XCTAssertEqual(userCredentials.refreshToken, "a refresh token")
-            XCTAssertEqual(userCredentials.tokenType, "Bearer")
-            XCTAssertEqual(userCredentials.userId, "a user id")
-        } catch let error as CustomStringConvertible {
-            XCTFail(error.description)
-        } catch {
-            XCTFail("Unknown error while authenticating")
-        }
+    func test_givenASucessfulResponse_thenCorrectCredentialsAreReturned() {
+        assertParsing(forResponseBody: "{\"access_token\":\"a token\",\"client_id\":\"a client id\",\"expires_in\":21599,\"refresh_token\":\"a refresh token\",\"token_type\":\"Bearer\",\"user_id\":\"a user id\"}", action: { sut in
+            try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+        }, assertions: { credentials in
+            XCTAssertEqual(credentials.accessToken, "a token")
+            XCTAssertEqual(credentials.clientId, "a client id")
+            XCTAssertEqual(credentials.expiresIn, 21599)
+            XCTAssertEqual(credentials.refreshToken, "a refresh token")
+            XCTAssertEqual(credentials.tokenType, "Bearer")
+            XCTAssertEqual(credentials.userId, "a user id")
+        })
     }
     
-    func test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown() {
+    func test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown() {
         let mockBadRequestStatusResponse = Response(version: Version(major: 0, minor: 0), status: .badRequest, headers: Headers(), cookieHeaders: [], body: .buffer([]))
         let stubHttpClient = StubHttpClient(response: mockBadRequestStatusResponse)
         let sut = Monzo.Client(httpClient: stubHttpClient)
@@ -78,7 +61,7 @@ class AuthenticationTests : XCTestCase {
         XCTFail(#function)
     }
     
-    func test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown() {
+    func test_givenAnInvalidResponseBody_thenParsingErrorIsThrown() {
         let responseBodyData = S4.Data([Byte]("{}".data(using: .utf8)!))
         let mockInvalidBodyResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
         let stubHttpClient = StubHttpClient(response: mockInvalidBodyResponse)
@@ -94,12 +77,12 @@ class AuthenticationTests : XCTestCase {
     
     static var allTests : [(String, (AuthenticationTests) -> () throws -> Void)] {
         return [
-            ("test_authenticationRequestHasCorrectUri", test_authenticationRequestHasCorrectUri),
-            ("test_authenticationRequestHasCorrectHeaders", test_authenticationRequestHasCorrectHeaders),
-            ("test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody", test_givenAuthenticationParameters_whenAuthenticating_thenTheRequestHasCorrectParametersInBody),
-            ("test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned", test_givenASucessfulResponse_whenAuthenticating_thenCorrectUserCredentialsAreReturned),
-            ("test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_whenAuthenticating_thenResponseErrorIsThrown),
-            ("test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_whenAuthenticating_thenParsingErrorIsThrown),
+            ("test_requestHasCorrectUri", test_requestHasCorrectUri),
+            ("test_requestHasCorrectHeaders", test_requestHasCorrectHeaders),
+            ("test_givenAuthenticationParameters_thenTheRequestHasCorrectParametersInBody", test_givenAuthenticationParameters_thenTheRequestHasCorrectParametersInBody),
+            ("test_givenASucessfulResponse_thenCorrectCredentialsAreReturned", test_givenASucessfulResponse_thenCorrectCredentialsAreReturned),
+            ("test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown),
+            ("test_givenAnInvalidResponseBody_thenParsingErrorIsThrown", test_givenAnInvalidResponseBody_thenParsingErrorIsThrown),
         ]
     }
     

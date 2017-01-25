@@ -1,4 +1,4 @@
-public struct UserCredentials {
+public struct Credentials {
     public let accessToken: String
     public let clientId: String
     public let expiresIn: UInt
