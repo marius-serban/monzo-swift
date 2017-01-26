@@ -44,4 +44,10 @@ public final class Client {
         
         return try retrieve(whoamiRequest)
     }
+    
+    public func accounts(accessToken: String) throws -> [Account] {
+        let accountsRequest = ApiRequest(path: "accounts", accessToken: accessToken)
+
+        return try retrieve(accountsRequest)
+    }
 }
