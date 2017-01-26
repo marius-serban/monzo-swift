@@ -6,4 +6,5 @@ XCTMain([
      testCase(AuthenticationTests.allTests),
      testCase(PingTests.allTests),
      testCase(WhoamiTests.allTests),
+     testCase(AccountsTests.allTests),
 ])

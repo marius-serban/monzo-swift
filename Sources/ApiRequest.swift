@@ -33,6 +33,11 @@ extension Client {
         return try parse(response.body.data)
     }
     
+    func retrieve<T: JsonArrayInitializable>(_ request: ApiRequest) throws -> [T] {
+        let jsonObject = try retrieve(request) as JsonObject
+        return try Array<T>.init(jsonObject: jsonObject)
+    }
+    
     private func validateResponseStatus(response: Response) throws {
         switch response.status.statusCode {
         case 0..<300 : return

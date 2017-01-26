@@ -49,30 +49,19 @@ class AuthenticationTests : XCTestCase {
     }
     
     func test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown() {
-        let mockBadRequestStatusResponse = Response(version: Version(major: 0, minor: 0), status: .badRequest, headers: Headers(), cookieHeaders: [], body: .buffer([]))
-        let stubHttpClient = StubHttpClient(response: mockBadRequestStatusResponse)
-        let sut = Monzo.Client(httpClient: stubHttpClient)
-        
-        do {
-            _ = try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
-        } catch Monzo.ClientError.responseError(.badRequest) {
-            return
-        } catch { }
-        XCTFail(#function)
+        assertThrows(forResponseStatus: .badRequest, action: { sut in
+            try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+        }, errorHandler: { error in
+            guard case Monzo.ClientError.responseError(.badRequest) = error else { XCTFail(#function); return }
+        })
     }
     
     func test_givenAnInvalidResponseBody_thenParsingErrorIsThrown() {
-        let responseBodyData = S4.Data([Byte]("{}".data(using: .utf8)!))
-        let mockInvalidBodyResponse = Response(version: Version(major: 1, minor: 1), status: .ok, headers: Headers(), cookieHeaders: [], body: .buffer(responseBodyData))
-        let stubHttpClient = StubHttpClient(response: mockInvalidBodyResponse)
-        let sut = Monzo.Client(httpClient: stubHttpClient)
-        
-        do {
-            _ = try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
-        } catch Monzo.ClientError.parsingError {
-            return
-        } catch { }
-        XCTFail(#function)
+        assertThrows(forResponseBody: "{}", action: { sut in
+            try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+        }, errorHandler: { error in
+            guard case Monzo.ClientError.parsingError = error else { XCTFail(#function); return }
+        })
     }
     
     static var allTests : [(String, (AuthenticationTests) -> () throws -> Void)] {
