@@ -51,8 +51,8 @@ public final class Client {
         return try retrieve(accountsRequest)
     }
     
-    public func balance(accessToken: String) throws -> Balance {
-        let balanceRequest = ApiRequest(path: "balance", accessToken: accessToken)
+    public func balance(accessToken: String, accountId: String) throws -> Balance {
+        let balanceRequest = ApiRequest(path: "balance", accessToken: accessToken, parameters: [("account_id", accountId)])
         
         return try retrieve(balanceRequest)
     }

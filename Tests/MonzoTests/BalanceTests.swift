@@ -5,8 +5,8 @@ import Monzo
 class BalanceTests : XCTestCase {
     
     func test_requestHasCorrectUri() {
-        assertRequestUriEquals("https://api.monzo.com/balance", forClientAction: { sut in
-            try sut.balance(accessToken: "")
+        assertRequestUriEquals("https://api.monzo.com/balance?account_id=test", forClientAction: { sut in
+            try sut.balance(accessToken: "", accountId: "test")
         })
     }
     
@@ -16,19 +16,19 @@ class BalanceTests : XCTestCase {
             "connection": "close",
             "authorization": "Bearer a_token"
             ], forClientAction: { sut in
-                try sut.balance(accessToken: "a_token")
+                try sut.balance(accessToken: "a_token", accountId: "")
         })
     }
     
     func test_requestHasEmptyBody() {
         assertRequestBodyIsEmpty(forClientAction: { sut in
-            try sut.balance(accessToken: "")
+            try sut.balance(accessToken: "", accountId: "account1")
         })
     }
     
     func test_givenASucessfulResponse_thenCorrectBalanceIsReturned() {
         assertParsing(forResponseBody: "{\"balance\":9223372036854775807,\"currency\":\"GBP\",\"spend_today\":-34250}", action: { sut in
-            try sut.balance(accessToken: "")
+            try sut.balance(accessToken: "", accountId: "")
         }, assertions: { balance in
             XCTAssertEqual(balance.balance, 9223372036854775807)
             XCTAssertEqual(balance.currency, "GBP")
@@ -38,7 +38,7 @@ class BalanceTests : XCTestCase {
     
     func test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown() {
         assertThrows(forResponseStatus: .badRequest, action: { sut in
-            try sut.balance(accessToken: "")
+            try sut.balance(accessToken: "", accountId: "")
         }, errorHandler: { error in
             guard case Monzo.ClientError.responseError(.badRequest) = error else { XCTFail(#function); return }
         })
@@ -46,7 +46,7 @@ class BalanceTests : XCTestCase {
     
     func test_givenAnInvalidResponseBody_thenParsingErrorIsThrown() {
         assertThrows(forResponseBody: "{}", action: { sut in
-            try sut.balance(accessToken: "")
+            try sut.balance(accessToken: "", accountId: "")
         }, errorHandler: { error in
             guard case Monzo.ClientError.parsingError = error else { XCTFail(#function); return }
         })
