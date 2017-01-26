@@ -73,3 +73,12 @@ extension Account : JsonInitializable {
 extension Account : JsonArrayInitializable {
     static var arrayKey: String { return "accounts" }
 }
+
+extension Balance : JsonInitializable {
+    init(jsonObject: JsonObject) throws {
+        // FIXME: balance and spendToday should be parsed as an 64 bit integer, currently doesn't work on linux
+        balance = Int64(try jsonObject.value(forKey: "balance") as Int)
+        currency = try jsonObject.value(forKey: "currency")
+        spendToday = Int64(try jsonObject.value(forKey: "spend_today") as Int)
+    }
+}

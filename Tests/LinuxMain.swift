@@ -7,4 +7,5 @@ XCTMain([
      testCase(PingTests.allTests),
      testCase(WhoamiTests.allTests),
      testCase(AccountsTests.allTests),
+     testCase(BalanceTests.allTests),
 ])
