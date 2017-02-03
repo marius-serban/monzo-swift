@@ -23,7 +23,10 @@ extension Client {
     }
     
     func retrieve<T: JsonInitializable>(_ request: ApiRequest) throws -> T {
-        let jsonObject = try retrieve(request) as JsonObject
+        var jsonObject = try retrieve(request) as JsonObject
+        if let nestedObjectKey = T.nestedObjectKey {
+            jsonObject = try jsonObject.value(forKey: nestedObjectKey) as JsonObject
+        }
         return try T.init(jsonObject: jsonObject)
     }
     

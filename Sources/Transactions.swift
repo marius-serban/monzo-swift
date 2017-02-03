@@ -12,6 +12,12 @@ extension Client {
         
         return try retrieve(transactionsRequest)
     }
+    
+    public func transaction(accessToken: String, id: String) throws -> Transaction {
+        let transactionRequest = ApiRequest(path: "transactions/\(id)", accessToken: accessToken)
+        
+        return try retrieve(transactionRequest)
+    }
 }
 
 public enum Since {
@@ -57,6 +63,8 @@ public struct Transaction {
 }
 
 extension Transaction : JsonInitializable {
+    static var nestedObjectKey: String? { return "transaction" }
+    
     init(jsonObject: JsonObject) throws {
         id = try jsonObject.value(forKey: "id")
         created = try type(of: self).iso8601Date(jsonObject.value(forKey: "created"))
