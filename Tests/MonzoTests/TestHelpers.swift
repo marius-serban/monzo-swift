@@ -1,6 +1,7 @@
 import XCTest
 import Monzo
 import S4
+import Foundation
 
 struct StubHttpClient : Responder {
     let response: Response
@@ -42,13 +43,22 @@ extension URI: CustomStringConvertible {
 extension XCTestCase {
     
     func assertRequestUriEquals<T>(_ expectedUri: String, forClientAction action: (Monzo.Client) throws -> T) {
+        let uriForAction = uri(forClientAction: action)
+        XCTAssertEqual(uriForAction.description, expectedUri)
+    }
+    
+    func assertRequestUriContains<T>(_ string: String, forClientAction action: (Monzo.Client) throws -> T) {
+        let uriForAction = uri(forClientAction: action)
+        XCTAssertTrue(uriForAction.description.contains(string), "\(uriForAction) does not contain \(string)")
+    }
+    
+    private func uri<T>(forClientAction action: (Monzo.Client) throws -> T) -> URI {
         let spyHttpClient = SpyHttpClient()
         let sut = Monzo.Client(httpClient: spyHttpClient)
         
         _ = try? action(sut)
         
-        let uri = spyHttpClient.lastCapturedRequest.uri
-        XCTAssertEqual(uri.description, expectedUri)
+        return spyHttpClient.lastCapturedRequest.uri
     }
     
     func assertRequestHeadersEqual<T>(_ expectedHeaders: [CaseInsensitiveString: String], forClientAction action: (Monzo.Client) throws -> T) {
@@ -101,6 +111,12 @@ extension XCTestCase {
         let sut = Monzo.Client(httpClient: stubHttpClient)
         
         XCTAssertThrowsError(try action(sut), testName, errorHandler)
+    }
+    
+    func contentsOfTextFile(_ relativeFilePath: String) -> String {
+        let parent = (#file).components(separatedBy: "/").dropLast().joined(separator: "/")
+        let fileURL = URL(string: "file://\(parent)/\(relativeFilePath)")!
+        return String(data: try! Data(contentsOf: fileURL), encoding: .utf8)!
     }
     
 }

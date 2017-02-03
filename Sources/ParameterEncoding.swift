@@ -3,7 +3,7 @@ import Foundation
 struct Parameters : ExpressibleByDictionaryLiteral, ExpressibleByArrayLiteral {
     fileprivate var _storage: [String: Parameter.Value]
     
-    fileprivate init(_ parameters: [Parameter]) {
+    init(_ parameters: [Parameter]) {
         var result: [String: Parameter.Value] = [:]
         parameters.forEach {
             assert(result[$0.name] == nil)
@@ -132,5 +132,3 @@ extension String {
         return encodedComponents.joined(separator: "+")
     }
 }
-
-
