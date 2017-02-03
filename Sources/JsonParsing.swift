@@ -4,10 +4,15 @@ typealias JsonObject = [String: Any]
 
 protocol JsonInitializable {
     init(jsonObject: JsonObject) throws
+    static var nestedObjectKey: String? { get }
 }
 
 protocol JsonArrayInitializable : JsonInitializable {
     static var arrayKey: String { get }
+}
+
+extension JsonInitializable {
+    static var nestedObjectKey: String? { return nil }
 }
 
 // FIXME: cleanup when SE-0143 gets implemented
