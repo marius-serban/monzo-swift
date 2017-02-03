@@ -1,0 +1,86 @@
+import Foundation
+
+extension Client {
+    public func transactions(accessToken: String, accountId: String, since: Since? = nil, before: Date? = nil, limit: UInt? = nil) throws -> [Transaction] {
+        let parameters = Parameters([
+            ("account_id", accountId),
+            since.map({ ("since", $0.rawValue) }),
+            before.map({ ("before", DateFormatter.iso8601Formatter().string(from: $0)) }),
+            limit.map({ ("limit", String($0)) })
+            ].flatMap({ $0 }).map(Parameter.init))
+        let transactionsRequest = ApiRequest(path: "transactions", accessToken: accessToken, parameters: parameters)
+        
+        return try retrieve(transactionsRequest)
+    }
+}
+
+public enum Since {
+    case date(Date)
+    case transaction(String)
+}
+
+extension Since: RawRepresentable {
+    public init?(rawValue: String) {
+        self = DateFormatter.iso8601Formatter().date(from: rawValue).flatMap(Since.date) ?? .transaction(rawValue)
+    }
+    
+    public var rawValue: String {
+        switch self {
+        case .date(let date): return DateFormatter.iso8601Formatter().string(from: date)
+        case .transaction(let transactionId): return transactionId
+        }
+    }
+}
+
+//TODO: support for attachments, counterparty, decline_reason, expanded merchant
+public struct Transaction {
+    public let id: String
+    public let created: Date
+    public let description: String
+    public let amount: Int
+    public let currency: String
+    public let merchant: String
+    public let notes: String
+    public let metadata: [String: String]
+    public let accountBalance: Int
+    public let category: String
+    public let isLoad: Bool
+    public let settled: Date
+    public let localAmount: Int
+    public let localCurrency: String
+    public let updated: Date
+    public let accountId: String
+    public let scheme: String
+    public let dedupeId: String
+    public let originator: Bool
+    public let includeInSpending: Bool
+}
+
+extension Transaction : JsonInitializable {
+    init(jsonObject: JsonObject) throws {
+        id = try jsonObject.value(forKey: "id")
+        created = try type(of: self).iso8601Date(jsonObject.value(forKey: "created"))
+        description = try jsonObject.value(forKey: "description")
+        amount = try jsonObject.value(forKey: "amount")
+        currency = try jsonObject.value(forKey: "currency")
+        merchant = try jsonObject.value(forKey: "merchant")
+        notes = try jsonObject.value(forKey: "notes")
+        metadata = try jsonObject.value(forKey: "metadata")
+        accountBalance = try jsonObject.value(forKey: "account_balance")
+        category = try jsonObject.value(forKey: "category")
+        isLoad = try jsonObject.value(forKey: "is_load")
+        settled = try type(of: self).iso8601Date(jsonObject.value(forKey: "settled"))
+        localAmount = try jsonObject.value(forKey: "local_amount")
+        localCurrency = try jsonObject.value(forKey: "local_currency")
+        updated = try type(of: self).iso8601Date(jsonObject.value(forKey: "updated"))
+        accountId = try jsonObject.value(forKey: "account_id")
+        scheme = try jsonObject.value(forKey: "scheme")
+        dedupeId = try jsonObject.value(forKey: "dedupe_id")
+        originator = try jsonObject.value(forKey: "originator")
+        includeInSpending = try jsonObject.value(forKey: "include_in_spending")
+    }
+}
+
+extension Transaction : JsonArrayInitializable {
+    static var arrayKey: String { return "transactions" }
+}

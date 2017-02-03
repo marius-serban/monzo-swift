@@ -8,4 +8,5 @@ XCTMain([
      testCase(WhoamiTests.allTests),
      testCase(AccountsTests.allTests),
      testCase(BalanceTests.allTests),
+     testCase(TransactionsTests.allTests),
 ])
