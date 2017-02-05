@@ -10,4 +10,5 @@ XCTMain([
      testCase(BalanceTests.allTests),
      testCase(TransactionsTests.allTests),
      testCase(TransactionTests.allTests),
+     testCase(AnnotateTransactionTests.allTests)
 ])
