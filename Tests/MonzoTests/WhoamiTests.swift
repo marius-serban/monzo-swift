@@ -4,73 +4,97 @@ import Monzo
 
 class WhoamiTests : XCTestCase {
     
-    func test_whoamiRequestHasCorrectUri() {
-        assertRequestUriEquals("https://api.monzo.com/ping/whoami", forClientAction: { sut in
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
             try sut.whoami()
-        })
+        }).method
+        
+        XCTAssertEqual(method, Method.get)
+    }
+    
+    func test_whoamiRequestHasCorrectUri() {
+        let uri = request(forClientAction: { sut in
+            try sut.whoami()
+        }).uri
+        
+        XCTAssertEqual(uri.description, "https://api.monzo.com/ping/whoami")
     }
     
     func test_givenAccessToken_thenTheRequestHasCorrectHeaders() {
-        assertRequestHeadersEqual([
+        let headers = request(forClientAction: { sut in
+            try sut.whoami(accessToken: "a_token")
+        }).headers.headers
+        
+        XCTAssertEqual(headers, [
             "host": "api.monzo.com",
             "connection": "close",
             "authorization": "Bearer a_token"
-            ], forClientAction: { sut in
-                try sut.whoami(accessToken: "a_token")
-        })
+            ])
     }
 
     func test_givenNoAccessToken_thenTheRequestHasCorrectHeaders() {
-        assertRequestHeadersEqual([
+        let headers = request(forClientAction: { sut in
+            try sut.whoami()
+        }).headers.headers
+        
+        XCTAssertEqual(headers, [
             "host": "api.monzo.com",
             "connection": "close"
-            ], forClientAction: { sut in
-                try sut.whoami()
-        })
+            ])
     }
     
     func test_whoamiRequestHasEmptyBody() {
-        assertRequestBodyIsEmpty(forClientAction: { sut in
+        let body = requestBody(forClientAction: { sut in
             try sut.whoami()
         })
+        
+        XCTAssertNotNil(body)
+        XCTAssertTrue(body!.isEmpty)
     }
 
     func test_givenAnAuthenticatedResponse_thenCorrectAccessTokenInfoIsReturned() {
-        assertParsing(forResponseBody: "{\"authenticated\":true,\"client_id\":\"a_client_id\",\"user_id\":\"a_user_id\"}", action: { sut in
-            try sut.whoami(accessToken: "")
-        }, assertions: { accessTokenInfo in
+        let sut = configuredClient(withResponseBody: "{\"authenticated\":true,\"client_id\":\"a_client_id\",\"user_id\":\"a_user_id\"}")
+        
+        do {
+            let accessTokenInfo = try sut.whoami(accessToken: "")
             guard case let .authenticated(clientId, userId) = accessTokenInfo else { XCTFail(#function); return }
             XCTAssertEqual(clientId, "a_client_id")
             XCTAssertEqual(userId, "a_user_id")
-        })
+        } catch {
+            XCTFail(String(describing: error))
+        }
     }
     
     func test_givenAnUnauthenticatedResponse_thenCorrectAccessTokenInfoIsReturned() {
-        assertParsing(forResponseBody: "{\"authenticated\":false}", action: { sut in
-            try sut.whoami(accessToken: "")
-        }, assertions: { accessTokenInfo in
+        let sut = configuredClient(withResponseBody: "{\"authenticated\":false}")
+        
+        do {
+            let accessTokenInfo = try sut.whoami(accessToken: "")
             guard case .notAuthenticated = accessTokenInfo else { XCTFail(#function); return }
-        })
+        } catch {
+            XCTFail(String(describing: error))
+        }
     }
 
     func test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown() {
-        assertThrows(forResponseStatus: .badRequest, action: { sut in
-            try sut.whoami(accessToken: "")
-        }, errorHandler: { error in
+        let sut = configuredClient(withResponseBody: "", responseStatus: .badRequest)
+        
+        XCTAssertThrowsError(try sut.whoami(accessToken: ""), #function) { error in
             guard case Monzo.ClientError.responseError(.badRequest) = error else { XCTFail(#function); return }
-        })
+        }
     }
 
     func test_givenAnInvalidResponseBody_thenParsingErrorIsThrown() {
-        assertThrows(forResponseBody: "{}", action: { sut in
-            try sut.whoami(accessToken: "")
-        }, errorHandler: { error in
+        let sut = configuredClient(withResponseBody: "{}")
+        
+        XCTAssertThrowsError(try sut.whoami(accessToken: ""), #function) { error in
             guard case Monzo.ClientError.parsingError = error else { XCTFail(#function); return }
-        })
+        }
     }
     
     static var allTests : [(String, (WhoamiTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_whoamiRequestHasCorrectUri", test_whoamiRequestHasCorrectUri),
             ("test_givenAccessToken_thenTheRequestHasCorrectHeaders", test_givenAccessToken_thenTheRequestHasCorrectHeaders),
             ("test_givenNoAccessToken_thenTheRequestHasCorrectHeaders", test_givenNoAccessToken_thenTheRequestHasCorrectHeaders),

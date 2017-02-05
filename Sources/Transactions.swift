@@ -4,7 +4,7 @@ extension Client {
     public func transactions(accessToken: String, accountId: String, since: Since? = nil, before: Date? = nil, limit: UInt? = nil) throws -> [Transaction] {
         let parameters = Parameters([
             ("account_id", accountId),
-            since.map({ ("since", $0.rawValue) }),
+            since.map({ ("since", $0.string) }),
             before.map({ ("before", DateFormatter.iso8601Formatter().string(from: $0)) }),
             limit.map({ ("limit", String($0)) })
             ].flatMap({ $0 }).map(Parameter.init))
@@ -18,6 +18,13 @@ extension Client {
         
         return try retrieve(transactionRequest)
     }
+    
+    public func annotate(transaction id: String, with metadata: [String: String], accessToken: String) throws {
+        let parameter = Parameter("metadata", metadata)
+        let annotateRequest = ApiRequest(method: .patch, path: "transactions/\(id)", accessToken: accessToken, parameters: Parameters(parameter))
+        
+        try deliver(annotateRequest)
+    }
 }
 
 public enum Since {
@@ -25,12 +32,8 @@ public enum Since {
     case transaction(String)
 }
 
-extension Since: RawRepresentable {
-    public init?(rawValue: String) {
-        self = DateFormatter.iso8601Formatter().date(from: rawValue).flatMap(Since.date) ?? .transaction(rawValue)
-    }
-    
-    public var rawValue: String {
+extension Since {
+    fileprivate var string: String {
         switch self {
         case .date(let date): return DateFormatter.iso8601Formatter().string(from: date)
         case .transaction(let transactionId): return transactionId

@@ -4,61 +4,83 @@ import Monzo
 
 class PingTests : XCTestCase {
     
-    func test_requestHasCorrectUri() {
-        assertRequestUriEquals("https://api.monzo.com/ping", forClientAction: { sut in
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
             try sut.ping()
-        })
+        }).method
+        
+        XCTAssertEqual(method, Method.get)
+    }
+    
+    func test_requestHasCorrectUri() {
+        let uri = request(forClientAction: { sut in
+            try sut.ping()
+        }).uri
+        
+        XCTAssertEqual(uri.description, "https://api.monzo.com/ping")
     }
     
     func test_givenAccessToken_thenTheRequestHasCorrectHeaders() {
-        assertRequestHeadersEqual([
+        let headers = request(forClientAction: { sut in
+            try sut.ping(accessToken: "a_token")
+        }).headers.headers
+        
+        XCTAssertEqual(headers, [
             "host": "api.monzo.com",
             "connection": "close",
             "authorization": "Bearer a_token"
-            ], forClientAction: { sut in
-                try sut.ping(accessToken: "a_token")
-        })
+            ])
     }
     
     func test_givenNoAccessToken_thenTheRequestHasCorrectHeaders() {
-        assertRequestHeadersEqual([
+        let headers = request(forClientAction: { sut in
+            try sut.ping()
+        }).headers.headers
+        
+        XCTAssertEqual(headers, [
             "host": "api.monzo.com",
             "connection": "close"
-            ], forClientAction: { sut in
-                try sut.ping()
-        })
+            ])
     }
     
     func test_requestHasEmptyBody() {
-        assertRequestBodyIsEmpty(forClientAction: { sut in
+        let body = requestBody(forClientAction: { sut in
             try sut.ping()
         })
+        
+        XCTAssertNotNil(body)
+        XCTAssertTrue(body!.isEmpty)
     }
     
     func test_givenASuccessfulResponse_thenNoExceptionIsThrown() {
-        assertParsing(forResponseBody: "{\"ping\":\"pong\"}", action: { sut in
+        let sut = configuredClient(withResponseBody: "{\"ping\":\"pong\"}")
+        
+        do {
             try sut.ping(accessToken: "")
-        }, assertions: nil)
+        } catch {
+            XCTFail(String(describing: error))
+        }
     }
     
     func test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown() {
-        assertThrows(forResponseStatus: .badRequest, action: { sut in
-            try sut.ping(accessToken: "")
-        }, errorHandler: { error in
+        let sut = configuredClient(withResponseBody: "", responseStatus: .badRequest)
+        
+        XCTAssertThrowsError(try sut.ping(accessToken: ""), #function) { error in
             guard case Monzo.ClientError.responseError(.badRequest) = error else { XCTFail(#function); return }
-        })
+        }
     }
     
     func test_givenAnInvalidResponseBody_thenParsingErrorIsThrown() {
-        assertThrows(forResponseBody: "{}", action: { sut in
-            try sut.ping(accessToken: "")
-        }, errorHandler: { error in
+        let sut = configuredClient(withResponseBody: "{}")
+        
+        XCTAssertThrowsError(try sut.ping(accessToken: ""), #function) { error in
             guard case Monzo.ClientError.parsingError = error else { XCTFail(#function); return }
-        })
+        }
     }
     
     static var allTests : [(String, (PingTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_requestHasCorrectUri", test_requestHasCorrectUri),
             ("test_givenAccessToken_thenTheRequestHasCorrectHeaders", test_givenAccessToken_thenTheRequestHasCorrectHeaders),
             ("test_givenNoAccessToken_thenTheRequestHasCorrectHeaders", test_givenNoAccessToken_thenTheRequestHasCorrectHeaders),

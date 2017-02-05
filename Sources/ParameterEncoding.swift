@@ -35,6 +35,7 @@ struct Parameter {
     enum Value {
         case simple(String)
         case array([String])
+        case dictionary([String: String])
     }
     
     let name: String
@@ -51,6 +52,10 @@ struct Parameter {
     
     init(_ name: String, _ values: [String]) {
         self.init(name, .array(values))
+    }
+    
+    init(_ name: String, _ values: [String: String]) {
+        self.init(name, .dictionary(values))
     }
 }
 
@@ -81,6 +86,17 @@ extension Parameter.Value : ExpressibleByArrayLiteral {
     }
 }
 
+extension Parameter.Value : ExpressibleByDictionaryLiteral {
+    public init(dictionaryLiteral elements: (String, String)...) {
+        var dictionary = [String: String]()
+        elements.forEach {
+            assert(dictionary[$0.0] == nil)
+            dictionary[$0.0] = $0.1
+        }
+        self = .dictionary(dictionary)
+    }
+}
+
 // MARK: URL Encoding (percent escaping)
 
 extension Parameters {
@@ -106,6 +122,13 @@ extension Parameters {
                 return values.map { value in
                     let percentEncodedValue = percentEscaping(value)
                     return "\(percentEncodedKey)[]=\(percentEncodedValue)"
+                    }.joined(separator: "&")
+            
+            case .dictionary(let pairs):
+                return pairs.map { pair in
+                    let percentEncodedPairKey = percentEscaping(pair.key)
+                    let percentEncodedPairValue = percentEscaping(pair.value)
+                    return "\(percentEncodedKey)[\(percentEncodedPairKey)]=\(percentEncodedPairValue)"
                     }.joined(separator: "&")
             }
         }
