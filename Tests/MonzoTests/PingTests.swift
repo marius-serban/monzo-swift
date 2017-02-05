@@ -4,6 +4,14 @@ import Monzo
 
 class PingTests : XCTestCase {
     
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
+            try sut.ping()
+        }).method
+        
+        XCTAssertEqual(method, Method.get)
+    }
+    
     func test_requestHasCorrectUri() {
         let uri = request(forClientAction: { sut in
             try sut.ping()
@@ -72,6 +80,7 @@ class PingTests : XCTestCase {
     
     static var allTests : [(String, (PingTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_requestHasCorrectUri", test_requestHasCorrectUri),
             ("test_givenAccessToken_thenTheRequestHasCorrectHeaders", test_givenAccessToken_thenTheRequestHasCorrectHeaders),
             ("test_givenNoAccessToken_thenTheRequestHasCorrectHeaders", test_givenNoAccessToken_thenTheRequestHasCorrectHeaders),

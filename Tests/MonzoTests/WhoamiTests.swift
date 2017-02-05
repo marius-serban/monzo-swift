@@ -4,6 +4,14 @@ import Monzo
 
 class WhoamiTests : XCTestCase {
     
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
+            try sut.whoami()
+        }).method
+        
+        XCTAssertEqual(method, Method.get)
+    }
+    
     func test_whoamiRequestHasCorrectUri() {
         let uri = request(forClientAction: { sut in
             try sut.whoami()
@@ -86,6 +94,7 @@ class WhoamiTests : XCTestCase {
     
     static var allTests : [(String, (WhoamiTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_whoamiRequestHasCorrectUri", test_whoamiRequestHasCorrectUri),
             ("test_givenAccessToken_thenTheRequestHasCorrectHeaders", test_givenAccessToken_thenTheRequestHasCorrectHeaders),
             ("test_givenNoAccessToken_thenTheRequestHasCorrectHeaders", test_givenNoAccessToken_thenTheRequestHasCorrectHeaders),

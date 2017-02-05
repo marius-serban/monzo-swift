@@ -4,6 +4,14 @@ import Monzo
 
 class AuthenticationTests : XCTestCase {
     
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
+            try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
+        }).method
+        
+        XCTAssertEqual(method, Method.post)
+    }
+    
     func test_requestHasCorrectUri() {
         let uri = request(forClientAction: { sut in
             try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
@@ -70,6 +78,7 @@ class AuthenticationTests : XCTestCase {
     
     static var allTests : [(String, (AuthenticationTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_requestHasCorrectUri", test_requestHasCorrectUri),
             ("test_requestHasCorrectHeaders", test_requestHasCorrectHeaders),
             ("test_givenAuthenticationParameters_thenTheRequestHasCorrectParametersInBody", test_givenAuthenticationParameters_thenTheRequestHasCorrectParametersInBody),

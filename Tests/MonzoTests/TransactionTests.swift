@@ -4,6 +4,14 @@ import Monzo
 
 class TransactionTests : XCTestCase {
     
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
+            try sut.transaction(accessToken: "", id: "")
+        }).method
+        
+        XCTAssertEqual(method, Method.get)
+    }
+    
     func test_requestHasCorrectUri() {
         let uri = request(forClientAction: { sut in
             try sut.transaction(accessToken: "", id: "txId1234")
@@ -82,6 +90,7 @@ class TransactionTests : XCTestCase {
     
     static var allTests : [(String, (TransactionTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_requestHasCorrectUri", test_requestHasCorrectUri),
             ("test_requestHasCorrectHeaders", test_requestHasCorrectHeaders),
             ("test_requestHasEmptyBody", test_requestHasEmptyBody),

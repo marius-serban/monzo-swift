@@ -5,6 +5,14 @@ import Foundation
 
 class TransactionsTests : XCTestCase {
     
+    func test_requestHasCorrectMethod() {
+        let method = request(forClientAction: { sut in
+            try sut.transactions(accessToken: "", accountId: "")
+        }).method
+        
+        XCTAssertEqual(method, Method.get)
+    }
+    
     func test_givenNoPaginationOrFilter_requestHasCorrectUri() {
         let uri = request(forClientAction: { sut in
             try sut.transactions(accessToken: "", accountId: "test")
@@ -119,6 +127,7 @@ class TransactionsTests : XCTestCase {
     
     static var allTests : [(String, (TransactionsTests) -> () throws -> Void)] {
         return [
+            ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_givenNoPaginationOrFilter_requestHasCorrectUri", test_givenNoPaginationOrFilter_requestHasCorrectUri),
             ("test_givenBeforeFilter_requestHasCorrectUri", test_givenBeforeFilter_requestHasCorrectUri),
             ("test_givenSinceDateFilter_requestHasCorrectUri", test_givenSinceDateFilter_requestHasCorrectUri),
