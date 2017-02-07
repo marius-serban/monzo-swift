@@ -14,8 +14,8 @@ public enum ClientError : Error {
     case parsingError
 }
 
-extension ClientError : CustomStringConvertible {
-    public var description: String {
+extension ClientError : CustomDebugStringConvertible {
+    public var debugDescription: String {
         switch self {
         case .accessTokenInvalid:
             return "The supplied access token is invalid or has expired"

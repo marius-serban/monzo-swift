@@ -1,6 +1,6 @@
 import Foundation
 
-struct Parameters : ExpressibleByDictionaryLiteral, ExpressibleByArrayLiteral {
+struct Parameters : ExpressibleByArrayLiteral {
     fileprivate var _storage: [String: Parameter.Value]
     
     init(_ parameters: [Parameter]) {
@@ -17,14 +17,9 @@ struct Parameters : ExpressibleByDictionaryLiteral, ExpressibleByArrayLiteral {
         self.init(parameters)
     }
     
-    // convenience initializer useful for mixed but static parameter values
-    init(dictionaryLiteral elements: (String, Parameter.Value)...) {
-        self.init(elements.map(Parameter.init))
-    }
-    
     // convenience initializer useful for only simple parameter values
     init(arrayLiteral elements: (String, String)...) {
-        self.init(elements.map(Parameter.init))
+        self.init(elements.map({ Parameter($0.0, .simple($0.1)) }))
     }
     
     var isEmpty: Bool { return _storage.isEmpty }
@@ -41,59 +36,24 @@ struct Parameter {
     let name: String
     let value: Value
     
-    init(_ name: String, _ value: Value) {
+    fileprivate init(_ name: String, _ value: Value) {
         self.name = name
         self.value = value
     }
     
-    init(_ name: String, _ value: String) {
-        self.init(name, .simple(value))
-    }
-    
-    init(_ name: String, _ values: [String]) {
-        self.init(name, .array(values))
-    }
-    
-    init(_ name: String, _ values: [String: String]) {
-        self.init(name, .dictionary(values))
-    }
-}
-
-extension Parameter.Value : ExpressibleByStringLiteral {
-    public init(stringLiteral value: String) {
-        self = .simple(value)
-    }
-    
-    public init(extendedGraphemeClusterLiteral value: String) {
-        self.init(stringLiteral: value)
-    }
-    
-    public init(unicodeScalarLiteral value: String) {
-        self.init(stringLiteral: value)
-    }
-}
-
-extension Parameter.Value : ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: String...) {
-        switch elements.count {
-        case 0:
-            self = .simple("")
-        case 1:
-            self = .simple(elements[0])
-        default:
-            self = .array(elements)
-        }
-    }
-}
-
-extension Parameter.Value : ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, String)...) {
+    init(_ name: String, _ values: [String: String?]) {
         var dictionary = [String: String]()
-        elements.forEach {
-            assert(dictionary[$0.0] == nil)
-            dictionary[$0.0] = $0.1
+        values.forEach { key, value in
+            if let value = value {
+                dictionary[key] = value
+            }
         }
-        self = .dictionary(dictionary)
+        self.init(name, .dictionary(dictionary))
+    }
+    
+    init?(_ name: String, _ value: String?) {
+        guard let value = value else { return nil }
+        self.init(name, .simple(value))
     }
 }
 

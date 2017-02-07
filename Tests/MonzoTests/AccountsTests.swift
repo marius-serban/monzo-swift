@@ -17,7 +17,7 @@ class AccountsTests : XCTestCase {
             try sut.accounts(accessToken: "")
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/accounts")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/accounts")
     }
     
     func test_requestHasCorrectHeaders() {

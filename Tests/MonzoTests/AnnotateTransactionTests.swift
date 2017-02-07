@@ -17,7 +17,7 @@ class AnnotateTransactionTests : XCTestCase {
             try sut.annotate(transaction: "txId1234", with: [:], accessToken: "")
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/transactions/txId1234")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/transactions/txId1234")
     }
 
     func test_requestHasCorrectHeaders() {
@@ -33,7 +33,7 @@ class AnnotateTransactionTests : XCTestCase {
             ])
     }
 
-    func test_requestHasCorrectBody() {
+    func test_givenMetadata_thenRequestHasCorrectBody() {
         let body = requestBody(forClientAction: { sut in
             try sut.annotate(transaction: "txId1234", with: ["key1": "value1", "key2": "value2"], accessToken: "")
         })
@@ -65,7 +65,7 @@ class AnnotateTransactionTests : XCTestCase {
             ("test_requestHasCorrectMethod", test_requestHasCorrectMethod),
             ("test_requestHasCorrectUri", test_requestHasCorrectUri),
             ("test_requestHasCorrectHeaders", test_requestHasCorrectHeaders),
-            ("test_requestHasCorrectBody", test_requestHasCorrectBody),
+            ("test_givenMetadata_thenRequestHasCorrectBody", test_givenMetadata_thenRequestHasCorrectBody),
             ("test_givenASucessfulResponse_thenNoExceptionIsThrown", test_givenASucessfulResponse_thenNoExceptionIsThrown),
             ("test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown", test_givenAnInvalidResponseStatus_thenResponseErrorIsThrown)
         ]

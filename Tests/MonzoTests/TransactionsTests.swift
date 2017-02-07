@@ -18,7 +18,7 @@ class TransactionsTests : XCTestCase {
             try sut.transactions(accessToken: "", accountId: "test")
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/transactions?account_id=test")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/transactions?account_id=test")
     }
     
     func test_givenBeforeFilter_requestHasCorrectUri() {
@@ -27,7 +27,7 @@ class TransactionsTests : XCTestCase {
             _ = try sut.transactions(accessToken: "", accountId: "test", before: epoch)
         }).uri
         
-        XCTAssertNotNil(uri.description.range(of: "before=1970-01-01T00:00:00.00Z"))
+        XCTAssertNotNil(uri.debugDescription.range(of: "before=1970-01-01T00:00:00.00Z"))
     }
     
     func test_givenSinceDateFilter_requestHasCorrectUri() {
@@ -36,7 +36,7 @@ class TransactionsTests : XCTestCase {
             _ = try sut.transactions(accessToken: "", accountId: "test", since: .date(epoch))
         }).uri
         
-        XCTAssertNotNil(uri.description.range(of: "since=1970-01-01T00:00:00.00Z"))
+        XCTAssertNotNil(uri.debugDescription.range(of: "since=1970-01-01T00:00:00.00Z"))
     }
     
     func test_givenSinceTransactionFilter_requestHasCorrectUri() {
@@ -44,7 +44,7 @@ class TransactionsTests : XCTestCase {
             try sut.transactions(accessToken: "", accountId: "test", since: .transaction("txid1234"))
         }).uri
         
-        XCTAssertNotNil(uri.description.range(of: "since=txid1234"))
+        XCTAssertNotNil(uri.debugDescription.range(of: "since=txid1234"))
     }
     
     func test_givenPagination_requestHasCorrectUri() {
@@ -52,7 +52,7 @@ class TransactionsTests : XCTestCase {
             try sut.transactions(accessToken: "", accountId: "test", limit: 1)
         }).uri
         
-        XCTAssertNotNil(uri.description.range(of: "limit=1"))
+        XCTAssertNotNil(uri.debugDescription.range(of: "limit=1"))
     }
     
     func test_requestHasCorrectHeaders() {

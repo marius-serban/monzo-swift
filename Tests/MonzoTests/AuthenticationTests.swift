@@ -17,7 +17,7 @@ class AuthenticationTests : XCTestCase {
             try sut.authenticate(withCode: "", clientId: "", clientSecret: "")
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/oauth2/token")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/oauth2/token")
     }
     
     func test_requestHasCorrectHeaders() {

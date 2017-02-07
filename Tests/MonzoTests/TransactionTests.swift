@@ -17,7 +17,7 @@ class TransactionTests : XCTestCase {
             try sut.transaction(accessToken: "", id: "txId1234")
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/transactions/txId1234")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/transactions/txId1234")
     }
     
     func test_requestHasCorrectHeaders() {
