@@ -3,8 +3,8 @@ import Monzo
 import S4
 import Foundation
 
-extension URI: CustomStringConvertible {
-    public var description: String {
+extension URI: CustomDebugStringConvertible {
+    public var debugDescription: String {
         let schemeString = (scheme ?? "") + "://"
         let userString = userInfo != nil ? "\(userInfo!.username):\(userInfo!.password)@" : ""
         let hostString = host ?? ""

@@ -7,7 +7,7 @@ class AuthorizationTests : XCTestCase {
     func test_givenClientIdAndRedirectUriAndNonce_thenAuthorizationUriIsCorrect() {
         let uri = Client.authorizationUri(clientId: "aClientId", redirectUri: "http://host.com/?test=[]#fragment", nonce: "abc123")
         
-        let uriString = uri.description
+        let uriString = uri.debugDescription
         XCTAssertTrue(uriString.hasPrefix("https://auth.getmondo.co.uk/?"))
         XCTAssertNotNil(uriString.range(of: "client_id=aClientId"))
         XCTAssertNotNil(uriString.range(of: "redirect_uri=http://host.com/?test=%5B%5D%23fragment"))

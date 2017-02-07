@@ -2,12 +2,14 @@ import Foundation
 
 extension Client {
     public func transactions(accessToken: String, accountId: String, since: Since? = nil, before: Date? = nil, limit: UInt? = nil) throws -> [Transaction] {
+        let before = before.map(DateFormatter.iso8601Formatter().string)
+        let limit = limit.map(String.init)
         let parameters = Parameters([
             ("account_id", accountId),
-            since.map({ ("since", $0.string) }),
-            before.map({ ("before", DateFormatter.iso8601Formatter().string(from: $0)) }),
-            limit.map({ ("limit", String($0)) })
-            ].flatMap({ $0 }).map(Parameter.init))
+            ("since", since?.string),
+            ("before", before),
+            ("limit", limit)
+        ].flatMap(Parameter.init))
         let transactionsRequest = ApiRequest(path: "transactions", accessToken: accessToken, parameters: parameters)
         
         return try retrieve(transactionsRequest)
@@ -20,8 +22,8 @@ extension Client {
     }
     
     public func annotate(transaction id: String, with metadata: [String: String], accessToken: String) throws {
-        let parameter = Parameter("metadata", metadata)
-        let annotateRequest = ApiRequest(method: .patch, path: "transactions/\(id)", accessToken: accessToken, parameters: Parameters(parameter))
+        let metadataParameter = Parameter("metadata", metadata)
+        let annotateRequest = ApiRequest(method: .patch, path: "transactions/\(id)", accessToken: accessToken, parameters: Parameters(metadataParameter))
         
         try deliver(annotateRequest)
     }

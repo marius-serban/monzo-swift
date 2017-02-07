@@ -17,7 +17,7 @@ class WhoamiTests : XCTestCase {
             try sut.whoami()
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/ping/whoami")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/ping/whoami")
     }
     
     func test_givenAccessToken_thenTheRequestHasCorrectHeaders() {

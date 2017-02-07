@@ -17,7 +17,7 @@ class PingTests : XCTestCase {
             try sut.ping()
         }).uri
         
-        XCTAssertEqual(uri.description, "https://api.monzo.com/ping")
+        XCTAssertEqual(uri.debugDescription, "https://api.monzo.com/ping")
     }
     
     func test_givenAccessToken_thenTheRequestHasCorrectHeaders() {
