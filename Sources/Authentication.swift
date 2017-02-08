@@ -11,6 +11,18 @@ extension Client {
         
         return try retrieve(authenticationRequest)
     }
+    
+    public func refreshAccessToken(refreshToken: String, clientId: String, clientSecret: String) throws -> Credentials {
+        let refreshAccessTokenRequest = ApiRequest(method: .post, path: "oauth2/token", parameters: [
+            ("grant_type", "refresh_token"),
+            ("client_id", clientId),
+            ("client_secret", clientSecret),
+            ("refresh_token", refreshToken)
+            ]
+        )
+        
+        return try retrieve(refreshAccessTokenRequest)
+    }
 }
 
 public struct Credentials {

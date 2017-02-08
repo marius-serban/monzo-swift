@@ -14,5 +14,6 @@ XCTMain([
      testCase(CreateFeedItemTests.allTests),
      testCase(CreateWebhookTests.allTests),
      testCase(WebhooksTests.allTests),
-     testCase(DeleteWebhookTests.allTests)
+     testCase(DeleteWebhookTests.allTests),
+     testCase(RefreshAccessTokenTests.allTests)
 ])
