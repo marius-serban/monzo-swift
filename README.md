@@ -47,6 +47,10 @@ let uri = Monzo.Client.authorizationUri(clientId: "aClientId", redirectUri: "htt
 ```swift
 let credentials = try monzo.authenticate(withCode: " ", clientId: " ", clientSecret: " ")
 ```
+or
+```swift
+let newCredentials = try sut.refreshAccessToken(refreshToken: oldCredentials.refreshToken, clientId: " ", clientSecret: " ")
+```
 
 ### Ping
 
@@ -64,6 +68,69 @@ do {
 let accessTokenInfo = try monzo.whoami(accessToken: "a_token")
 ```
 
+### Accounts
+
+```swift
+let accounts = try monzo.accounts(accessToken: "a_token")
+```
+
+### Balance
+
+```swift
+let balance = try monzo.balance(accessToken: "a_token", accountId: "an_account_id")
+```
+
+### Transactions
+
+```swift
+// list all transactions
+let transactions = try monzo.transactions(accessToken: "a_token", accountId: "an_account_id")
+
+// list transactions, filtered and paginated
+let transactions = try monzo.transactions(accessToken: "a_token", accountId: "an_account_id", since: .transaction("txid1234"), before: referenceDate, limit: 20)
+
+// get transaction details
+let transactionDetails = try monzo.transaction(accessToken: "a_token", id: "txid1234")
+```
+
+### Annotate transaction
+
+```swift
+try monzo.annotate(transaction: "txid1234", with metadata: ["key1": "value1", "key2": "value2"], accessToken: String)
+```
+
+### Feed
+
+```swift
+// create simple feed item
+try sut.createFeedItem(accessToken: "a_token", accountId: "an_account", title: "Hello!", imageUrl: "http://images.domain/1")
+
+// create fully customized feed item
+try.createFeedItem(
+	accessToken: "a_token",
+	accountId: "an_account_id",
+	title: "happy days! 🕺🏽",
+	imageUrl: "http://images.domain/an-image.jpeg?param=j&other=k",
+	url: "http://my.website/?param1=1&param2=2",
+	body: "this is a sample body",
+	backgroundColor: "#FFFFFF",
+	bodyColor: "#AAAAAA",
+	titleColor: "#BBBBBB"
+)
+```
+
+### Webhooks
+
+```swift
+// create
+let webhook =try monzo.createWebhook(accessToken: "a_token", accountId: "account_id", url: "http://host.domain/path")
+
+// list
+let webhooks = try monzo.webhooks(accessToken: "a_token", accountId: "account_id")
+
+// delete
+try monzo.deleteWebhook(accessToken: "a_token", id: "account_id")
+```
 
 ## Support
 
