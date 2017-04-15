@@ -49,7 +49,7 @@ let credentials = try monzo.authenticate(withCode: " ", clientId: " ", clientSec
 ```
 or
 ```swift
-let newCredentials = try sut.refreshAccessToken(refreshToken: oldCredentials.refreshToken, clientId: " ", clientSecret: " ")
+let newCredentials = try monzo.refreshAccessToken(refreshToken: oldCredentials.refreshToken, clientId: " ", clientSecret: " ")
 ```
 
 ### Ping
@@ -103,7 +103,7 @@ try monzo.annotate(transaction: "txid1234", with metadata: ["key1": "value1", "k
 
 ```swift
 // create simple feed item
-try sut.createFeedItem(accessToken: "a_token", accountId: "an_account", title: "Hello!", imageUrl: "http://images.domain/1")
+try monzo.createFeedItem(accessToken: "a_token", accountId: "an_account", title: "Hello!", imageUrl: "http://images.domain/1")
 
 // create fully customized feed item
 try.createFeedItem(
